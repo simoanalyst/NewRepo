@@ -1,0 +1,562 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  FARMER
+  BUYER
+  WHOLESALER
+  RETAILER
+  EXPORTER
+  TRANSPORT_PROVIDER
+  COOPERATIVE_MANAGER
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum ProductStatus {
+  DRAFT
+  ACTIVE
+  SOLD_OUT
+  EXPIRED
+  SUSPENDED
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  READY_FOR_PICKUP
+  IN_TRANSIT
+  DELIVERED
+  COMPLETED
+  CANCELLED
+  DISPUTED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  MPESA_STK
+  MPESA_B2C
+  BANK_TRANSFER
+  CASH_ON_DELIVERY
+}
+
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  REFUNDED
+  CANCELLED
+}
+
+enum DeliveryStatus {
+  PENDING
+  ASSIGNED
+  PICKED_UP
+  IN_TRANSIT
+  DELIVERED
+  FAILED
+}
+
+enum NotificationType {
+  ORDER
+  PAYMENT
+  DELIVERY
+  PRICE_ALERT
+  WEATHER
+  ADVISORY
+  SYSTEM
+  PROMOTION
+}
+
+enum ReviewType {
+  BUYER_TO_FARMER
+  FARMER_TO_BUYER
+  BUYER_TO_TRANSPORT
+}
+
+model User {
+  id            String    @id @default(uuid())
+  email         String?   @unique
+  phone         String    @unique
+  passwordHash  String
+  role          UserRole
+  firstName     String
+  lastName      String
+  nationalId    String?   @unique
+  county        String
+  subCounty     String?
+  ward          String?
+  isVerified    Boolean   @default(false)
+  isActive      Boolean   @default(true)
+  profilePhoto  String?
+  emailVerifiedAt DateTime?
+  phoneVerifiedAt DateTime?
+  lastLoginAt   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  farmerProfile     FarmerProfile?
+  buyerProfile      BuyerProfile?
+  transportProvider TransportProvider?
+  products          Product[]
+  buyerOrders       Order[]           @relation("BuyerOrders")
+  farmerOrders      Order[]           @relation("FarmerOrders")
+  payments          Payment[]
+  givenReviews      Review[]          @relation("ReviewGiven")
+  receivedReviews   Review[]          @relation("ReviewReceived")
+  notifications     Notification[]
+  advisories        Advisory[]
+  knowledgeArticles KnowledgeArticle[]
+  warehouses        Warehouse[]
+  cooperativeMember CooperativeMember[]
+  managedCooperative CooperativeSociety? @relation("CooperativeManager")
+  deliveries        Delivery[]
+  otpTokens         OtpToken[]
+
+  @@map("users")
+}
+
+model OtpToken {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String
+  type      String   // EMAIL_VERIFY, PHONE_VERIFY, PASSWORD_RESET
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@map("otp_tokens")
+}
+
+model FarmerProfile {
+  id            String   @id @default(uuid())
+  userId        String   @unique
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  farmSize      Float?
+  farmSizeUnit  String?  @default("acres")
+  farmLocation  String?
+  gpsLat        Float?
+  gpsLng        Float?
+  mainCrops     String[]
+  livestockTypes String[]
+  farmPhotos    String[]
+  bio           String?
+  irrigationType String?
+  soilType      String?
+  certifications String[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("farmer_profiles")
+}
+
+model BuyerProfile {
+  id              String   @id @default(uuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  businessName    String?
+  businessType    String?
+  kraPin          String?
+  businessAddress String?
+  businessLicense String?
+  preferredProducts String[]
+  monthlyBudget   Float?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("buyer_profiles")
+}
+
+model TransportProvider {
+  id            String   @id @default(uuid())
+  userId        String   @unique
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  vehicleType   String
+  vehicleReg    String   @unique
+  capacity      Float
+  capacityUnit  String   @default("tonnes")
+  hasRefrigeration Boolean @default(false)
+  counties      String[]
+  pricePerKm    Float
+  available     Boolean  @default(true)
+  rating        Float    @default(0)
+  totalDeliveries Int    @default(0)
+  licenseNumber String?
+  insuranceExpiry DateTime?
+  currentLat    Float?
+  currentLng    Float?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  deliveries    Delivery[]
+  orders        Order[]
+
+  @@map("transport_providers")
+}
+
+model Category {
+  id          String    @id @default(uuid())
+  name        String    @unique
+  slug        String    @unique
+  icon        String?
+  description String?
+  parentId    String?
+  parent      Category? @relation("SubCategories", fields: [parentId], references: [id])
+  children    Category[] @relation("SubCategories")
+  products    Product[]
+  createdAt   DateTime  @default(now())
+
+  @@map("categories")
+}
+
+model Product {
+  id              String        @id @default(uuid())
+  farmerId        String
+  farmer          User          @relation(fields: [farmerId], references: [id])
+  categoryId      String
+  category        Category      @relation(fields: [categoryId], references: [id])
+  name            String
+  description     String?
+  quantity        Float
+  unit            String
+  grade           String?
+  price           Float
+  minOrderQty     Float         @default(1)
+  harvestDate     DateTime?
+  expiryDate      DateTime?
+  county          String
+  subCounty       String?
+  location        String?
+  gpsLat          Float?
+  gpsLng          Float?
+  photos          String[]
+  status          ProductStatus @default(ACTIVE)
+  organicCertified Boolean     @default(false)
+  certificationNo String?
+  viewCount       Int           @default(0)
+  isFeatured      Boolean       @default(false)
+  tags            String[]
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  orderItems      OrderItem[]
+
+  @@index([farmerId])
+  @@index([categoryId])
+  @@index([county])
+  @@index([status])
+  @@map("products")
+}
+
+model Order {
+  id                  String      @id @default(uuid())
+  buyerId             String
+  buyer               User        @relation("BuyerOrders", fields: [buyerId], references: [id])
+  farmerId            String
+  farmer              User        @relation("FarmerOrders", fields: [farmerId], references: [id])
+  status              OrderStatus @default(PENDING)
+  totalAmount         Float
+  notes               String?
+  deliveryAddress     String?
+  deliveryLat         Float?
+  deliveryLng         Float?
+  transportProviderId String?
+  transportProvider   TransportProvider? @relation(fields: [transportProviderId], references: [id])
+  deliveryFee         Float?      @default(0)
+  platformFee         Float?      @default(0)
+  paymentStatus       PaymentStatus @default(PENDING)
+  expectedDeliveryDate DateTime?
+  deliveredAt         DateTime?
+  cancelledAt         DateTime?
+  cancellationReason  String?
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
+
+  items               OrderItem[]
+  payments            Payment[]
+  reviews             Review[]
+  delivery            Delivery?
+
+  @@index([buyerId])
+  @@index([farmerId])
+  @@index([status])
+  @@map("orders")
+}
+
+model OrderItem {
+  id          String   @id @default(uuid())
+  orderId     String
+  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id])
+  quantity    Float
+  unitPrice   Float
+  totalPrice  Float
+  unit        String
+
+  @@map("order_items")
+}
+
+model Payment {
+  id                  String        @id @default(uuid())
+  orderId             String
+  order               Order         @relation(fields: [orderId], references: [id])
+  userId              String
+  user                User          @relation(fields: [userId], references: [id])
+  amount              Float
+  method              PaymentMethod
+  status              PaymentStatus @default(PENDING)
+  mpesaTransactionId  String?
+  mpesaReceiptNumber  String?
+  mpesaCheckoutRequestId String?
+  phoneNumber         String?
+  merchantRequestId   String?
+  resultCode          Int?
+  resultDesc          String?
+  failureReason       String?
+  refundedAt          DateTime?
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+
+  @@index([orderId])
+  @@index([userId])
+  @@map("payments")
+}
+
+model Review {
+  id          String     @id @default(uuid())
+  reviewerId  String
+  reviewer    User       @relation("ReviewGiven", fields: [reviewerId], references: [id])
+  revieweeId  String
+  reviewee    User       @relation("ReviewReceived", fields: [revieweeId], references: [id])
+  orderId     String
+  order       Order      @relation(fields: [orderId], references: [id])
+  rating      Int
+  comment     String?
+  type        ReviewType
+  photos      String[]
+  createdAt   DateTime   @default(now())
+
+  @@unique([reviewerId, orderId, type])
+  @@map("reviews")
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  message   String
+  type      NotificationType
+  read      Boolean          @default(false)
+  readAt    DateTime?
+  data      Json?
+  createdAt DateTime         @default(now())
+
+  @@index([userId])
+  @@map("notifications")
+}
+
+model MarketPrice {
+  id          String   @id @default(uuid())
+  productName String
+  category    String
+  county      String
+  price       Float
+  unit        String
+  date        DateTime
+  source      String
+  minPrice    Float?
+  maxPrice    Float?
+  avgPrice    Float?
+  createdAt   DateTime @default(now())
+
+  @@index([productName, county, date])
+  @@map("market_prices")
+}
+
+model PriceForecast {
+  id             String   @id @default(uuid())
+  productName    String
+  category       String
+  county         String
+  predictedPrice Float
+  forecastDate   DateTime
+  confidence     Float
+  factors        Json?
+  model          String   @default("linear_regression")
+  createdAt      DateTime @default(now())
+
+  @@map("price_forecasts")
+}
+
+model Warehouse {
+  id           String   @id @default(uuid())
+  ownerId      String
+  owner        User     @relation(fields: [ownerId], references: [id])
+  name         String
+  county       String
+  location     String
+  gpsLat       Float?
+  gpsLng       Float?
+  capacity     Float
+  capacityUnit String   @default("tonnes")
+  usedCapacity Float    @default(0)
+  pricePerUnit Float
+  pricePeriod  String   @default("per_month")
+  facilities   String[]
+  available    Boolean  @default(true)
+  photos       String[]
+  rating       Float    @default(0)
+  description  String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("warehouses")
+}
+
+model Delivery {
+  id                  String         @id @default(uuid())
+  orderId             String         @unique
+  order               Order          @relation(fields: [orderId], references: [id])
+  transportProviderId String
+  transportProvider   TransportProvider @relation(fields: [transportProviderId], references: [id])
+  driverId            String?
+  driverUser          User?          @relation(fields: [driverId], references: [id])
+  status              DeliveryStatus @default(PENDING)
+  pickupAddress       String?
+  pickupLat           Float?
+  pickupLng           Float?
+  deliveryAddress     String?
+  deliveryLat         Float?
+  deliveryLng         Float?
+  distance            Float?
+  estimatedArrival    DateTime?
+  actualArrival       DateTime?
+  trackingCode        String?        @unique
+  currentLat          Float?
+  currentLng          Float?
+  trackingHistory     Json[]
+  notes               String?
+  pickedUpAt          DateTime?
+  deliveredAt         DateTime?
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+
+  @@map("deliveries")
+}
+
+model CooperativeSociety {
+  id             String   @id @default(uuid())
+  name           String
+  registrationNo String   @unique
+  county         String
+  subCounty      String?
+  managerId      String   @unique
+  manager        User     @relation("CooperativeManager", fields: [managerId], references: [id])
+  description    String?
+  logo           String?
+  website        String?
+  phone          String?
+  email          String?
+  members        CooperativeMember[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("cooperative_societies")
+}
+
+model CooperativeMember {
+  id              String             @id @default(uuid())
+  cooperativeId   String
+  cooperative     CooperativeSociety @relation(fields: [cooperativeId], references: [id])
+  userId          String
+  user            User               @relation(fields: [userId], references: [id])
+  membershipNo    String?
+  joinedAt        DateTime           @default(now())
+  isActive        Boolean            @default(true)
+
+  @@unique([cooperativeId, userId])
+  @@map("cooperative_members")
+}
+
+model Advisory {
+  id          String   @id @default(uuid())
+  officerId   String
+  officer     User     @relation(fields: [officerId], references: [id])
+  title       String
+  content     String
+  category    String
+  county      String?
+  severity    String   @default("INFO")
+  tags        String[]
+  attachments String[]
+  isPublished Boolean  @default(false)
+  publishedAt DateTime?
+  viewCount   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("advisories")
+}
+
+model KnowledgeArticle {
+  id          String   @id @default(uuid())
+  authorId    String
+  author      User     @relation(fields: [authorId], references: [id])
+  title       String
+  content     String
+  summary     String?
+  category    String
+  tags        String[]
+  mediaUrls   String[]
+  isPublished Boolean  @default(false)
+  viewCount   Int      @default(0)
+  publishedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("knowledge_articles")
+}
+
+model WeatherData {
+  id          String   @id @default(uuid())
+  county      String
+  temperature Float
+  humidity    Float
+  rainfall    Float?
+  windSpeed   Float?
+  condition   String
+  forecast    Json?
+  source      String   @default("openweather")
+  recordedAt  DateTime @default(now())
+
+  @@index([county, recordedAt])
+  @@map("weather_data")
+}
+
+model PriceAlert {
+  id          String   @id @default(uuid())
+  userId      String
+  productName String
+  county      String?
+  targetPrice Float
+  condition   String   // above, below
+  isActive    Boolean  @default(true)
+  triggeredAt DateTime?
+  createdAt   DateTime @default(now())
+
+  @@map("price_alerts")
+}
