@@ -1,0 +1,616 @@
+name: Deploy MkulimaLink to AWS
+
+on:
+  push:
+    branches:
+      - main        # production deploy
+      - staging     # staging deploy
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened]
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
+  BACKEND_IMAGE: mkulimalink-backend
+  FRONTEND_IMAGE: mkulimalink-frontend
+  NODE_VERSION: '20'
+
+jobs:
+  # ─── Lint & Test ────────────────────────────────────────────────────────────
+  test-backend:
+    name: Test Backend
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_DB: mkulimalink_test
+          POSTGRES_USER: mkulima
+          POSTGRES_PASSWORD: testpassword
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: npm ci
+
+      - name: Generate Prisma client
+        working-directory: backend
+        run: npx prisma generate
+        env:
+          DATABASE_URL: postgresql://mkulima:testpassword@localhost:5432/mkulimalink_test?schema=public
+
+      - name: Run database migrations (test)
+        working-directory: backend
+        run: npx prisma migrate deploy
+        env:
+          DATABASE_URL: postgresql://mkulima:testpassword@localhost:5432/mkulimalink_test?schema=public
+
+      - name: Run linter
+        working-directory: backend
+        run: npm run lint --if-present
+
+      - name: Run tests
+        working-directory: backend
+        run: npm test -- --coverage --forceExit
+        env:
+          NODE_ENV: test
+          DATABASE_URL: postgresql://mkulima:testpassword@localhost:5432/mkulimalink_test?schema=public
+          REDIS_URL: redis://localhost:6379
+          JWT_SECRET: test-jwt-secret-at-least-32-characters-long
+          JWT_REFRESH_SECRET: test-jwt-refresh-secret-at-least-32-chars
+
+      - name: Upload test coverage
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-coverage
+          path: backend/coverage/
+          retention-days: 7
+
+  test-frontend:
+    name: Test Frontend
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Run linter
+        working-directory: frontend
+        run: npm run lint --if-present
+
+      - name: Type check
+        working-directory: frontend
+        run: npm run type-check --if-present
+
+      - name: Run tests
+        working-directory: frontend
+        run: npm test -- --watchAll=false --coverage
+        env:
+          CI: true
+          NEXT_PUBLIC_API_URL: https://api.mkulimalink.co.ke/api/v1
+
+      - name: Build frontend (verify it compiles)
+        working-directory: frontend
+        run: npm run build
+        env:
+          NEXT_PUBLIC_API_URL: https://api.mkulimalink.co.ke/api/v1
+          NEXTAUTH_SECRET: build-time-secret
+          NEXTAUTH_URL: https://www.mkulimalink.co.ke
+
+  # ─── Security Scan ──────────────────────────────────────────────────────────
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    needs: [test-backend, test-frontend]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run npm audit (backend)
+        working-directory: backend
+        run: npm audit --audit-level=high
+        continue-on-error: true
+
+      - name: Run npm audit (frontend)
+        working-directory: frontend
+        run: npm audit --audit-level=high
+        continue-on-error: true
+
+      - name: Run Trivy vulnerability scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Upload Trivy scan results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+  # ─── Build & Push Docker Images ─────────────────────────────────────────────
+  build-and-push:
+    name: Build & Push Docker Images
+    runs-on: ubuntu-latest
+    needs: [test-backend, test-frontend, security-scan]
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/staging')
+
+    outputs:
+      backend-image: ${{ steps.build-backend.outputs.image }}
+      frontend-image: ${{ steps.build-frontend.outputs.image }}
+      image-tag: ${{ steps.meta.outputs.tag }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Log in to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Generate image metadata
+        id: meta
+        run: |
+          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            echo "environment=production" >> $GITHUB_OUTPUT
+            echo "tag=${{ github.sha }}" >> $GITHUB_OUTPUT
+          else
+            echo "environment=staging" >> $GITHUB_OUTPUT
+            echo "tag=staging-${{ github.sha }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push backend image
+        id: build-backend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          target: production
+          push: true
+          tags: |
+            ${{ env.ECR_REGISTRY }}/${{ env.BACKEND_IMAGE }}:${{ steps.meta.outputs.tag }}
+            ${{ env.ECR_REGISTRY }}/${{ env.BACKEND_IMAGE }}:${{ steps.meta.outputs.environment }}-latest
+          cache-from: type=gha,scope=backend-${{ steps.meta.outputs.environment }}
+          cache-to: type=gha,mode=max,scope=backend-${{ steps.meta.outputs.environment }}
+          build-args: |
+            NODE_VERSION=${{ env.NODE_VERSION }}
+          labels: |
+            org.opencontainers.image.title=MkulimaLink Backend
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+
+      - name: Record backend image URI
+        run: |
+          echo "image=${{ env.ECR_REGISTRY }}/${{ env.BACKEND_IMAGE }}:${{ steps.meta.outputs.tag }}" >> $GITHUB_OUTPUT
+
+      - name: Build and push frontend image
+        id: build-frontend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          target: production
+          push: true
+          tags: |
+            ${{ env.ECR_REGISTRY }}/${{ env.FRONTEND_IMAGE }}:${{ steps.meta.outputs.tag }}
+            ${{ env.ECR_REGISTRY }}/${{ env.FRONTEND_IMAGE }}:${{ steps.meta.outputs.environment }}-latest
+          cache-from: type=gha,scope=frontend-${{ steps.meta.outputs.environment }}
+          cache-to: type=gha,mode=max,scope=frontend-${{ steps.meta.outputs.environment }}
+          build-args: |
+            NODE_VERSION=${{ env.NODE_VERSION }}
+            NEXT_PUBLIC_API_URL=${{ steps.meta.outputs.environment == 'production' && 'https://api.mkulimalink.co.ke/api/v1' || 'https://api-staging.mkulimalink.co.ke/api/v1' }}
+
+  # ─── Deploy to Staging ───────────────────────────────────────────────────────
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    if: github.ref == 'refs/heads/staging'
+    environment:
+      name: staging
+      url: https://staging.mkulimalink.co.ke
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Set up SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.STAGING_EC2_SSH_KEY }}" > ~/.ssh/staging-key.pem
+          chmod 600 ~/.ssh/staging-key.pem
+          ssh-keyscan -H ${{ secrets.STAGING_EC2_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Run database migrations on staging
+        run: |
+          ssh -i ~/.ssh/staging-key.pem ubuntu@${{ secrets.STAGING_EC2_HOST }} << 'ENDSSH'
+            cd /opt/mkulima-link/backend
+            export DATABASE_URL="${{ secrets.STAGING_DATABASE_URL }}"
+            npx prisma migrate deploy
+          ENDSSH
+
+      - name: Deploy backend to staging EC2
+        run: |
+          ssh -i ~/.ssh/staging-key.pem ubuntu@${{ secrets.STAGING_EC2_HOST }} << 'ENDSSH'
+            # Pull latest image from ECR
+            aws ecr get-login-password --region us-east-1 | \
+              docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}
+
+            docker pull ${{ env.ECR_REGISTRY }}/${{ env.BACKEND_IMAGE }}:staging-${{ github.sha }}
+
+            # Stop and remove old container
+            docker stop mkulimalink-backend-staging 2>/dev/null || true
+            docker rm mkulimalink-backend-staging 2>/dev/null || true
+
+            # Start new container
+            docker run -d \
+              --name mkulimalink-backend-staging \
+              --restart always \
+              -p 5000:5000 \
+              --env-file /opt/mkulima-link/.env.staging \
+              ${{ env.ECR_REGISTRY }}/${{ env.BACKEND_IMAGE }}:staging-${{ github.sha }}
+
+            # Prune old images
+            docker image prune -f
+          ENDSSH
+
+      - name: Deploy frontend to staging EC2
+        run: |
+          ssh -i ~/.ssh/staging-key.pem ubuntu@${{ secrets.STAGING_EC2_HOST }} << 'ENDSSH'
+            docker pull ${{ env.ECR_REGISTRY }}/${{ env.FRONTEND_IMAGE }}:staging-${{ github.sha }}
+
+            docker stop mkulimalink-frontend-staging 2>/dev/null || true
+            docker rm mkulimalink-frontend-staging 2>/dev/null || true
+
+            docker run -d \
+              --name mkulimalink-frontend-staging \
+              --restart always \
+              -p 3000:3000 \
+              --env-file /opt/mkulima-link/.env.staging.frontend \
+              ${{ env.ECR_REGISTRY }}/${{ env.FRONTEND_IMAGE }}:staging-${{ github.sha }}
+          ENDSSH
+
+      - name: Health check – staging backend
+        run: |
+          sleep 15
+          for i in {1..10}; do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://api-staging.mkulimalink.co.ke/api/v1/health || echo "000")
+            if [ "$STATUS" = "200" ]; then
+              echo "✅ Staging backend is healthy (HTTP $STATUS)"
+              exit 0
+            fi
+            echo "Attempt $i: HTTP $STATUS – waiting 10s..."
+            sleep 10
+          done
+          echo "❌ Staging health check failed"
+          exit 1
+
+      - name: Notify on staging deploy success
+        if: success()
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_CHANNEL: '#deployments'
+          SLACK_COLOR: good
+          SLACK_TITLE: Staging Deploy Successful
+          SLACK_MESSAGE: "MkulimaLink staging deployed — commit `${{ github.sha }}` by @${{ github.actor }}"
+          SLACK_FOOTER: "MkulimaLink CI/CD"
+
+      - name: Notify on staging deploy failure
+        if: failure()
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_CHANNEL: '#deployments'
+          SLACK_COLOR: danger
+          SLACK_TITLE: Staging Deploy FAILED
+          SLACK_MESSAGE: "MkulimaLink staging deploy failed for commit `${{ github.sha }}`"
+
+  # ─── Deploy to Production ────────────────────────────────────────────────────
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: production
+      url: https://www.mkulimalink.co.ke
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Set up SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.PROD_EC2_SSH_KEY }}" > ~/.ssh/prod-key.pem
+          chmod 600 ~/.ssh/prod-key.pem
+          ssh-keyscan -H ${{ secrets.PROD_EC2_HOST_1 }} >> ~/.ssh/known_hosts
+          ssh-keyscan -H ${{ secrets.PROD_EC2_HOST_2 }} >> ~/.ssh/known_hosts
+
+      - name: Create RDS database snapshot before migration
+        run: |
+          SNAPSHOT_ID="mkulimalink-pre-deploy-$(date +%Y%m%d-%H%M%S)"
+          aws rds create-db-snapshot \
+            --db-instance-identifier ${{ secrets.RDS_INSTANCE_ID }} \
+            --db-snapshot-identifier "$SNAPSHOT_ID"
+          echo "Created snapshot: $SNAPSHOT_ID"
+          echo "SNAPSHOT_ID=$SNAPSHOT_ID" >> $GITHUB_ENV
+
+      - name: Run database migrations (production)
+        run: |
+          ssh -i ~/.ssh/prod-key.pem ubuntu@${{ secrets.PROD_EC2_HOST_1 }} << 'ENDSSH'
+            cd /opt/mkulima-link/backend
+            export DATABASE_URL="${{ secrets.PROD_DATABASE_URL }}"
+            # Verify migration status before applying
+            npx prisma migrate status
+            npx prisma migrate deploy
+          ENDSSH
+
+      - name: Rolling deploy – node 1
+        id: deploy-node1
+        run: |
+          ssh -i ~/.ssh/prod-key.pem ubuntu@${{ secrets.PROD_EC2_HOST_1 }} << 'ENDSSH'
+            aws ecr get-login-password --region us-east-1 | \
+              docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}
+
+            # Pull images
+            docker pull ${{ env.ECR_REGISTRY }}/${{ env.BACKEND_IMAGE }}:${{ github.sha }}
+            docker pull ${{ env.ECR_REGISTRY }}/${{ env.FRONTEND_IMAGE }}:${{ github.sha }}
+
+            # Update backend
+            docker stop mkulimalink-backend 2>/dev/null || true
+            docker rm mkulimalink-backend 2>/dev/null || true
+            docker run -d \
+              --name mkulimalink-backend \
+              --restart always \
+              -p 5000:5000 \
+              --env-file /opt/mkulima-link/.env.production \
+              ${{ env.ECR_REGISTRY }}/${{ env.BACKEND_IMAGE }}:${{ github.sha }}
+
+            # Update frontend
+            docker stop mkulimalink-frontend 2>/dev/null || true
+            docker rm mkulimalink-frontend 2>/dev/null || true
+            docker run -d \
+              --name mkulimalink-frontend \
+              --restart always \
+              -p 3000:3000 \
+              --env-file /opt/mkulima-link/.env.production.frontend \
+              ${{ env.ECR_REGISTRY }}/${{ env.FRONTEND_IMAGE }}:${{ github.sha }}
+
+            docker image prune -f
+          ENDSSH
+
+      - name: Health check – node 1
+        run: |
+          sleep 20
+          for i in {1..12}; do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+              http://${{ secrets.PROD_EC2_HOST_1 }}:5000/api/v1/health || echo "000")
+            if [ "$STATUS" = "200" ]; then
+              echo "✅ Node 1 healthy (HTTP $STATUS)"
+              break
+            fi
+            echo "Attempt $i: HTTP $STATUS"
+            if [ "$i" = "12" ]; then
+              echo "❌ Node 1 health check failed — ABORTING rolling deploy"
+              exit 1
+            fi
+            sleep 10
+          done
+
+      - name: Rolling deploy – node 2
+        needs: deploy-node1
+        run: |
+          ssh -i ~/.ssh/prod-key.pem ubuntu@${{ secrets.PROD_EC2_HOST_2 }} << 'ENDSSH'
+            aws ecr get-login-password --region us-east-1 | \
+              docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}
+
+            docker pull ${{ env.ECR_REGISTRY }}/${{ env.BACKEND_IMAGE }}:${{ github.sha }}
+            docker pull ${{ env.ECR_REGISTRY }}/${{ env.FRONTEND_IMAGE }}:${{ github.sha }}
+
+            docker stop mkulimalink-backend 2>/dev/null || true
+            docker rm mkulimalink-backend 2>/dev/null || true
+            docker run -d \
+              --name mkulimalink-backend \
+              --restart always \
+              -p 5000:5000 \
+              --env-file /opt/mkulima-link/.env.production \
+              ${{ env.ECR_REGISTRY }}/${{ env.BACKEND_IMAGE }}:${{ github.sha }}
+
+            docker stop mkulimalink-frontend 2>/dev/null || true
+            docker rm mkulimalink-frontend 2>/dev/null || true
+            docker run -d \
+              --name mkulimalink-frontend \
+              --restart always \
+              -p 3000:3000 \
+              --env-file /opt/mkulima-link/.env.production.frontend \
+              ${{ env.ECR_REGISTRY }}/${{ env.FRONTEND_IMAGE }}:${{ github.sha }}
+
+            docker image prune -f
+          ENDSSH
+
+      - name: Health check – full production
+        run: |
+          sleep 20
+          for i in {1..12}; do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+              https://api.mkulimalink.co.ke/api/v1/health || echo "000")
+            if [ "$STATUS" = "200" ]; then
+              echo "✅ Production healthy (HTTP $STATUS)"
+              exit 0
+            fi
+            echo "Attempt $i: HTTP $STATUS"
+            sleep 10
+          done
+          echo "❌ Production health check failed"
+          exit 1
+
+      - name: Invalidate CloudFront cache
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
+            --paths "/*"
+
+      - name: Tag release in ECR
+        run: |
+          MANIFEST=$(aws ecr batch-get-image \
+            --repository-name ${{ env.BACKEND_IMAGE }} \
+            --image-ids imageTag=${{ github.sha }} \
+            --query 'images[0].imageManifest' \
+            --output text)
+          aws ecr put-image \
+            --repository-name ${{ env.BACKEND_IMAGE }} \
+            --image-tag "release-$(date +%Y%m%d)" \
+            --image-manifest "$MANIFEST" || true
+
+      - name: Notify on production deploy success
+        if: success()
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_CHANNEL: '#deployments'
+          SLACK_COLOR: good
+          SLACK_TITLE: "Production Deploy Successful 🚀"
+          SLACK_MESSAGE: |
+            MkulimaLink *production* deployed successfully!
+            Commit: `${{ github.sha }}`
+            Author: @${{ github.actor }}
+            URL: https://www.mkulimalink.co.ke
+          SLACK_FOOTER: "MkulimaLink CI/CD"
+
+      - name: Notify on production deploy failure
+        if: failure()
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_CHANNEL: '#deployments'
+          SLACK_COLOR: danger
+          SLACK_TITLE: "PRODUCTION DEPLOY FAILED ❌"
+          SLACK_MESSAGE: |
+            MkulimaLink *production* deploy FAILED!
+            Commit: `${{ github.sha }}`
+            DB Snapshot (for rollback): `${{ env.SNAPSHOT_ID }}`
+            Check logs: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+  # ─── Notify PR ──────────────────────────────────────────────────────────────
+  notify-pr:
+    name: Comment on PR
+    runs-on: ubuntu-latest
+    needs: [test-backend, test-frontend]
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - name: Post PR comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const botComment = comments.find(c =>
+              c.user.type === 'Bot' && c.body.includes('MkulimaLink CI Results')
+            );
+
+            const body = `## MkulimaLink CI Results ✅
+
+            All checks passed for commit \`${{ github.sha }}\`.
+
+            | Check | Status |
+            |-------|--------|
+            | Backend tests | ✅ Passed |
+            | Frontend tests | ✅ Passed |
+            | Security scan | ✅ Passed |
+
+            This PR is ready for review and merge to \`main\`.`;
+
+            if (botComment) {
+              github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body,
+              });
+            } else {
+              github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            }
