@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Your wishlist at Wa-ng'ash Stores.">
+  <title>Wishlist — Wa-ng'ash Stores</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body data-page="wishlist">
+
+<div class="page-loader">
+  <div class="loader-logo">Wa-ng'ash <span>Stores</span></div>
+  <div class="loader-bar"><div class="loader-progress"></div></div>
+</div>
+
+<nav class="navbar scrolled">
+  <div class="container">
+    <a href="index.html" class="nav-logo">
+      <div class="nav-logo-icon">👟</div>
+      <div><div class="nav-logo-text">Wa-ng'ash</div><div class="nav-logo-sub">Stores</div></div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="shop.html">Shop</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <div class="nav-actions">
+      <button class="nav-icon-btn theme-toggle" aria-label="Toggle theme"><i class="fas fa-moon theme-icon"></i></button>
+      <a href="wishlist.html" class="nav-icon-btn active" aria-label="Wishlist">
+        <i class="fas fa-heart" style="color:#EF4444"></i>
+        <span class="nav-badge wishlist-badge" style="display:none">0</span>
+      </a>
+      <button class="nav-icon-btn cart-toggle" aria-label="Cart">
+        <i class="fas fa-shopping-bag"></i>
+        <span class="nav-badge cart-badge" style="display:none">0</span>
+      </button>
+      <button class="hamburger" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+
+<div class="mobile-menu">
+  <a href="index.html"><i class="fas fa-home"></i> Home</a>
+  <a href="shop.html"><i class="fas fa-store"></i> Shop All</a>
+  <a href="about.html"><i class="fas fa-info-circle"></i> About</a>
+  <a href="contact.html"><i class="fas fa-envelope"></i> Contact</a>
+</div>
+
+<section class="page-hero">
+  <div class="container">
+    <div class="section-label" style="justify-content:center;color:var(--secondary-light)">
+      <i class="fas fa-heart"></i> Saved Items
+    </div>
+    <h1>My Wishlist</h1>
+    <p>Your saved favourites — ready to add to cart whenever you are.</p>
+  </div>
+</section>
+
+<main class="wishlist-page">
+  <div class="container">
+    <div class="wishlist-empty" style="display:none;flex-direction:column;align-items:center;padding:5rem">
+      <div class="empty-icon">💝</div>
+      <h2>Your wishlist is empty</h2>
+      <p style="color:var(--text-muted);margin-bottom:2rem">Start adding items you love while you browse our collection.</p>
+      <a href="shop.html" class="btn btn-primary"><i class="fas fa-shopping-bag"></i> Explore Products</a>
+    </div>
+    <div class="product-grid wishlist-grid" role="list"></div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="index.html" class="nav-logo"><div class="nav-logo-icon">👟</div><div><div class="nav-logo-text">Wa-ng'ash</div><div class="nav-logo-sub">Stores</div></div></a>
+        <p class="footer-desc">"Style That Speaks for You"</p>
+        <div class="social-links">
+          <a href="#" class="social-link" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="#" class="social-link" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Quick Links</h4>
+        <ul class="footer-links">
+          <li><a href="index.html"><i class="fas fa-chevron-right"></i> Home</a></li>
+          <li><a href="shop.html"><i class="fas fa-chevron-right"></i> Shop</a></li>
+          <li><a href="about.html"><i class="fas fa-chevron-right"></i> About</a></li>
+          <li><a href="contact.html"><i class="fas fa-chevron-right"></i> Contact</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Categories</h4>
+        <ul class="footer-links">
+          <li><a href="shop.html?category=mens-shoes"><i class="fas fa-chevron-right"></i> Men's Shoes</a></li>
+          <li><a href="shop.html?category=womens-shoes"><i class="fas fa-chevron-right"></i> Women's Shoes</a></li>
+          <li><a href="shop.html?category=eyeglasses"><i class="fas fa-chevron-right"></i> Eyeglasses</a></li>
+          <li><a href="shop.html?category=purses"><i class="fas fa-chevron-right"></i> Purses</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Contact</h4>
+        <div class="footer-contact-item"><i class="fas fa-phone"></i><span>+254 700 123 456</span></div>
+        <div class="footer-contact-item"><i class="fas fa-envelope"></i><span>hello@wangash.co.ke</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="container" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem">
+      <p>© 2025 <span>Wa-ng'ash Stores</span>. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<div class="cart-overlay" onclick="closeCart()"></div>
+<aside class="cart-sidebar">
+  <div class="cart-header">
+    <div class="cart-title"><i class="fas fa-shopping-bag" style="color:var(--secondary)"></i> Your Cart <span class="cart-count-badge">0</span></div>
+    <button class="cart-close" onclick="closeCart()"><i class="fas fa-times"></i></button>
+  </div>
+  <div class="cart-items"></div>
+  <div class="cart-footer">
+    <div class="cart-subtotal"><span>Subtotal</span><span class="cart-subtotal-amount">KSh 0</span></div>
+    <div class="cart-subtotal"><span>Shipping</span><span>KSh 250</span></div>
+    <div class="cart-total"><span class="cart-total-label">Total</span><span class="cart-total-amount">KSh 0</span></div>
+    <button class="btn btn-checkout" onclick="openCheckout()"><i class="fas fa-lock"></i> Checkout</button>
+    <button class="btn-continue" onclick="closeCart()">← Continue Shopping</button>
+  </div>
+</aside>
+
+<div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal-content"></div>
+</div>
+
+<div class="checkout-overlay modal-overlay" onclick="if(event.target===this)closeCheckout()">
+  <div class="checkout-content modal-content" style="padding:2rem;max-width:600px">
+    <button class="modal-close" onclick="closeCheckout()"><i class="fas fa-times"></i></button>
+  </div>
+</div>
+
+<div class="toast-container" aria-live="polite"></div>
+<button class="back-to-top" aria-label="Back to top"><i class="fas fa-arrow-up"></i></button>
+
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

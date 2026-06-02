@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Product details at Wa-ng'ash Stores.">
+  <title>Product — Wa-ng'ash Stores</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body data-page="product">
+
+<div class="page-loader">
+  <div class="loader-logo">Wa-ng'ash <span>Stores</span></div>
+  <div class="loader-bar"><div class="loader-progress"></div></div>
+</div>
+
+<nav class="navbar scrolled">
+  <div class="container">
+    <a href="index.html" class="nav-logo">
+      <div class="nav-logo-icon">👟</div>
+      <div><div class="nav-logo-text">Wa-ng'ash</div><div class="nav-logo-sub">Stores</div></div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="shop.html" class="active">Shop</a></li>
+      <li><a href="shop.html?category=mens-shoes">Men's</a></li>
+      <li><a href="shop.html?category=womens-shoes">Women's</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <div class="nav-actions">
+      <button class="nav-icon-btn theme-toggle" aria-label="Toggle theme"><i class="fas fa-moon theme-icon"></i></button>
+      <a href="wishlist.html" class="nav-icon-btn" aria-label="Wishlist">
+        <i class="far fa-heart"></i>
+        <span class="nav-badge wishlist-badge" style="display:none">0</span>
+      </a>
+      <button class="nav-icon-btn cart-toggle" aria-label="Cart">
+        <i class="fas fa-shopping-bag"></i>
+        <span class="nav-badge cart-badge" style="display:none">0</span>
+      </button>
+      <button class="hamburger" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+
+<div class="mobile-menu">
+  <a href="index.html"><i class="fas fa-home"></i> Home</a>
+  <a href="shop.html"><i class="fas fa-store"></i> Shop All</a>
+  <a href="about.html"><i class="fas fa-info-circle"></i> About</a>
+  <a href="contact.html"><i class="fas fa-envelope"></i> Contact</a>
+</div>
+
+<main class="product-detail">
+  <div class="container">
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb" style="justify-content:flex-start;margin-bottom:2rem;padding-top:0" aria-label="Breadcrumb">
+      <a href="index.html" style="color:var(--text-muted)">Home</a>
+      <span style="color:var(--border)"><i class="fas fa-chevron-right" style="font-size:0.7rem"></i></span>
+      <a href="shop.html" style="color:var(--text-muted)">Shop</a>
+      <span style="color:var(--border)"><i class="fas fa-chevron-right" style="font-size:0.7rem"></i></span>
+      <span class="product-detail-cat" style="color:var(--text)">Product</span>
+    </nav>
+
+    <div class="product-detail-grid">
+      <!-- Gallery -->
+      <div class="product-gallery reveal-left">
+        <div class="gallery-main" style="background:linear-gradient(145deg,#1E3A5F,#2d5a8f)">
+          <span class="main-emoji" style="font-size:10rem">👞</span>
+          <div class="gallery-zoom-hint"><i class="fas fa-search-plus"></i> Hover to zoom</div>
+        </div>
+        <div class="gallery-thumbs"></div>
+      </div>
+
+      <!-- Product Info -->
+      <div class="product-detail-info reveal-right">
+        <div class="product-category-tag product-detail-cat">Category</div>
+        <h1 class="product-detail-name">Loading…</h1>
+
+        <div class="product-detail-rating">
+          <div class="stars detail-rating">★★★★★</div>
+          <span class="rating-count detail-review-count">(0 reviews)</span>
+          <button class="write-review">Write a review</button>
+        </div>
+
+        <div class="product-detail-price">
+          <span class="detail-price-current">KSh 0</span>
+          <span class="detail-price-original" style="display:none"></span>
+          <span class="detail-price-save" style="display:none"></span>
+        </div>
+
+        <div class="detail-section">
+          <div class="detail-section-label">Description</div>
+          <p class="product-detail-desc" style="color:var(--text-light);font-size:0.95rem;line-height:1.7"></p>
+        </div>
+
+        <div class="detail-section">
+          <div class="detail-section-label">Select Size</div>
+          <div class="size-options detail-sizes"></div>
+          <a href="#" style="font-size:0.8rem;color:var(--primary);margin-top:0.4rem;display:inline-block">
+            <i class="fas fa-ruler"></i> Size Guide
+          </a>
+        </div>
+
+        <div class="detail-section">
+          <div class="detail-section-label">Quantity</div>
+          <div class="qty-controls">
+            <button class="qty-btn btn-qty-minus" aria-label="Decrease quantity">−</button>
+            <span class="qty-value detail-qty">1</span>
+            <button class="qty-btn btn-qty-plus" aria-label="Increase quantity">+</button>
+          </div>
+        </div>
+
+        <div class="detail-actions">
+          <button class="btn btn-detail-cart">
+            <i class="fas fa-shopping-cart"></i> Add to Cart
+          </button>
+          <button class="btn-detail-wish" aria-label="Add to wishlist">
+            <i class="far fa-heart"></i>
+          </button>
+        </div>
+
+        <div class="product-features"></div>
+
+        <!-- Trust Signals -->
+        <div style="display:flex;flex-direction:column;gap:0.5rem;padding:1.25rem;background:var(--accent);border-radius:var(--r-md);margin-top:1rem">
+          <div style="display:flex;align-items:center;gap:0.75rem;font-size:0.85rem;color:var(--text-light)">
+            <i class="fas fa-truck" style="color:var(--secondary);width:16px"></i>
+            <span>Free delivery on orders above KSh 5,000</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:0.75rem;font-size:0.85rem;color:var(--text-light)">
+            <i class="fas fa-undo" style="color:var(--secondary);width:16px"></i>
+            <span>30-day easy returns &amp; exchanges</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:0.75rem;font-size:0.85rem;color:var(--text-light)">
+            <i class="fas fa-shield-alt" style="color:var(--secondary);width:16px"></i>
+            <span>100% authentic, quality guaranteed</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:0.75rem;font-size:0.85rem;color:var(--text-light)">
+            <i class="fas fa-headset" style="color:var(--secondary);width:16px"></i>
+            <span>24/7 customer support via WhatsApp</span>
+          </div>
+        </div>
+
+        <!-- Share -->
+        <div style="display:flex;align-items:center;gap:0.75rem;margin-top:1.5rem">
+          <span style="font-size:0.85rem;color:var(--text-muted);font-weight:600">Share:</span>
+          <a href="#" class="action-btn" style="background:var(--accent)" aria-label="Share on Facebook"><i class="fab fa-facebook-f" style="color:#1877F2"></i></a>
+          <a href="#" class="action-btn" style="background:var(--accent)" aria-label="Share on WhatsApp"><i class="fab fa-whatsapp" style="color:#25D366"></i></a>
+          <a href="#" class="action-btn" style="background:var(--accent)" aria-label="Share on Twitter"><i class="fab fa-twitter" style="color:#1DA1F2"></i></a>
+          <a href="#" class="action-btn" style="background:var(--accent)" aria-label="Copy link"><i class="fas fa-link" style="color:var(--text-muted)"></i></a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Related Products -->
+    <div style="margin-top:5rem">
+      <div class="section-header reveal">
+        <div>
+          <div class="section-label">You May Also Like</div>
+          <h2>Related Products</h2>
+        </div>
+        <a href="shop.html" class="view-all">View All <i class="fas fa-arrow-right"></i></a>
+      </div>
+      <div class="product-grid related-grid" role="list"></div>
+    </div>
+  </div>
+</main>
+
+<!-- Footer -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="index.html" class="nav-logo"><div class="nav-logo-icon">👟</div><div><div class="nav-logo-text">Wa-ng'ash</div><div class="nav-logo-sub">Stores</div></div></a>
+        <p class="footer-desc">"Style That Speaks for You" — Premium fashion accessories for the modern Kenyan.</p>
+        <div class="social-links">
+          <a href="#" class="social-link" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" class="social-link" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="#" class="social-link" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Quick Links</h4>
+        <ul class="footer-links">
+          <li><a href="index.html"><i class="fas fa-chevron-right"></i> Home</a></li>
+          <li><a href="shop.html"><i class="fas fa-chevron-right"></i> Shop</a></li>
+          <li><a href="about.html"><i class="fas fa-chevron-right"></i> About</a></li>
+          <li><a href="contact.html"><i class="fas fa-chevron-right"></i> Contact</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Categories</h4>
+        <ul class="footer-links">
+          <li><a href="shop.html?category=mens-shoes"><i class="fas fa-chevron-right"></i> Men's Shoes</a></li>
+          <li><a href="shop.html?category=womens-shoes"><i class="fas fa-chevron-right"></i> Women's Shoes</a></li>
+          <li><a href="shop.html?category=eyeglasses"><i class="fas fa-chevron-right"></i> Eyeglasses</a></li>
+          <li><a href="shop.html?category=purses"><i class="fas fa-chevron-right"></i> Purses</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Contact</h4>
+        <div class="footer-contact-item"><i class="fas fa-phone"></i><span>+254 700 123 456</span></div>
+        <div class="footer-contact-item"><i class="fas fa-envelope"></i><span>hello@wangash.co.ke</span></div>
+        <div class="footer-contact-item"><i class="fas fa-map-marker-alt"></i><span>Kenyatta Ave, Nairobi</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="container" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem">
+      <p>© 2025 <span>Wa-ng'ash Stores</span>. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<!-- Cart -->
+<div class="cart-overlay" onclick="closeCart()"></div>
+<aside class="cart-sidebar">
+  <div class="cart-header">
+    <div class="cart-title"><i class="fas fa-shopping-bag" style="color:var(--secondary)"></i> Your Cart <span class="cart-count-badge">0</span></div>
+    <button class="cart-close" onclick="closeCart()"><i class="fas fa-times"></i></button>
+  </div>
+  <div class="cart-items"></div>
+  <div class="cart-footer">
+    <div class="cart-subtotal"><span>Subtotal</span><span class="cart-subtotal-amount">KSh 0</span></div>
+    <div class="cart-subtotal"><span>Shipping</span><span>KSh 250</span></div>
+    <div class="cart-total"><span class="cart-total-label">Total</span><span class="cart-total-amount">KSh 0</span></div>
+    <button class="btn btn-checkout" onclick="openCheckout()"><i class="fas fa-lock"></i> Checkout</button>
+    <button class="btn-continue" onclick="closeCart()">← Continue Shopping</button>
+  </div>
+</aside>
+
+<div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal-content"></div>
+</div>
+
+<div class="checkout-overlay modal-overlay" onclick="if(event.target===this)closeCheckout()">
+  <div class="checkout-content modal-content" style="padding:2rem;max-width:600px">
+    <button class="modal-close" onclick="closeCheckout()"><i class="fas fa-times"></i></button>
+  </div>
+</div>
+
+<div class="toast-container" aria-live="polite"></div>
+<button class="back-to-top" aria-label="Back to top"><i class="fas fa-arrow-up"></i></button>
+
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

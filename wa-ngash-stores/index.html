@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Wa-ng'ash Stores — Premium shoes, eyeglasses and handbags. Style That Speaks for You.">
+  <meta name="keywords" content="shoes, eyeglasses, purses, handbags, fashion, Kenya, Wa-ng'ash">
+  <title>Wa-ng'ash Stores — Style That Speaks for You</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body data-page="home">
+
+<!-- Page Loader -->
+<div class="page-loader" id="pageLoader">
+  <div class="loader-logo">Wa-ng'ash <span>Stores</span></div>
+  <div class="loader-bar"><div class="loader-progress"></div></div>
+</div>
+
+<!-- Navigation -->
+<nav class="navbar transparent" role="navigation" aria-label="Main navigation">
+  <div class="container">
+    <a href="index.html" class="nav-logo" aria-label="Wa-ng'ash Stores Home">
+      <div class="nav-logo-icon" aria-hidden="true">👟</div>
+      <div>
+        <div class="nav-logo-text">Wa-ng'ash</div>
+        <div class="nav-logo-sub">Stores</div>
+      </div>
+    </a>
+
+    <ul class="nav-links" role="list">
+      <li><a href="index.html" class="active">Home</a></li>
+      <li><a href="shop.html">Shop</a></li>
+      <li><a href="shop.html?category=mens-shoes">Men's</a></li>
+      <li><a href="shop.html?category=womens-shoes">Women's</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+
+    <div class="nav-actions">
+      <button class="nav-icon-btn theme-toggle" aria-label="Toggle dark mode" title="Toggle theme">
+        <i class="fas fa-moon theme-icon"></i>
+      </button>
+      <a href="wishlist.html" class="nav-icon-btn" aria-label="Wishlist">
+        <i class="far fa-heart"></i>
+        <span class="nav-badge wishlist-badge" style="display:none">0</span>
+      </a>
+      <button class="nav-icon-btn cart-toggle" aria-label="Open shopping cart">
+        <i class="fas fa-shopping-bag"></i>
+        <span class="nav-badge cart-badge" style="display:none">0</span>
+      </button>
+      <button class="hamburger" aria-label="Toggle menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile Menu -->
+<div class="mobile-menu" role="menu">
+  <a href="index.html" role="menuitem"><i class="fas fa-home"></i> Home</a>
+  <a href="shop.html" role="menuitem"><i class="fas fa-store"></i> Shop All</a>
+  <a href="shop.html?category=mens-shoes" role="menuitem"><i class="fas fa-shoe-prints"></i> Men's Shoes</a>
+  <a href="shop.html?category=womens-shoes" role="menuitem"><i class="fas fa-shoe-prints"></i> Women's Shoes</a>
+  <a href="shop.html?category=eyeglasses" role="menuitem"><i class="fas fa-glasses"></i> Eyeglasses</a>
+  <a href="shop.html?category=purses" role="menuitem"><i class="fas fa-shopping-bag"></i> Purses</a>
+  <a href="about.html" role="menuitem"><i class="fas fa-info-circle"></i> About Us</a>
+  <a href="contact.html" role="menuitem"><i class="fas fa-envelope"></i> Contact</a>
+  <a href="wishlist.html" role="menuitem"><i class="far fa-heart"></i> Wishlist</a>
+</div>
+
+<!-- ══ HERO SECTION ══ -->
+<section class="hero" aria-label="Hero banner">
+  <div class="hero-bg" aria-hidden="true"></div>
+  <div class="hero-shapes" aria-hidden="true">
+    <span></span><span></span><span></span><span></span>
+  </div>
+
+  <div class="container">
+    <div class="hero-content">
+      <div class="hero-eyebrow">
+        <i class="fas fa-star"></i> New 2025 Collection Available Now
+      </div>
+      <h1 class="hero-title">
+        Discover Fashion That<br><span class="highlight">Completes Your Look</span>
+      </h1>
+      <p class="hero-desc">
+        Premium shoes, eyeglasses, and handbags for the style-conscious. Quality craftsmanship, timeless designs — delivered to your door.
+      </p>
+      <div class="hero-actions">
+        <a href="shop.html" class="btn btn-gold">
+          <i class="fas fa-shopping-bag"></i> Shop Now
+        </a>
+        <a href="shop.html" class="btn btn-outline-white">
+          <i class="fas fa-compass"></i> Explore Collection
+        </a>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <span class="hero-stat-num">500+</span>
+          <span class="hero-stat-label">Products</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-num">10k+</span>
+          <span class="hero-stat-label">Happy Customers</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-num">4.9★</span>
+          <span class="hero-stat-label">Average Rating</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-visual" aria-hidden="true">
+      <div class="hero-card hero-card-1">
+        <div class="hero-card-emoji">👠</div>
+        <div class="hero-card-label">Women's Heels</div>
+        <div class="hero-card-price">From KSh 2,600</div>
+      </div>
+      <div class="hero-card">
+        <div class="hero-card-emoji">👞</div>
+        <div class="hero-card-label">Men's Oxfords</div>
+      </div>
+      <div class="hero-card">
+        <div class="hero-card-emoji">👜</div>
+        <div class="hero-card-label">Handbags</div>
+      </div>
+      <div class="hero-card">
+        <div class="hero-card-emoji">🕶️</div>
+        <div class="hero-card-label">Eyeglasses</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ CATEGORIES SECTION ══ -->
+<section class="categories" aria-labelledby="cat-heading">
+  <div class="container">
+    <div class="text-center reveal">
+      <div class="section-label" aria-hidden="true">What We Offer</div>
+      <h2 id="cat-heading" class="section-heading">Shop by Category</h2>
+      <p class="section-desc">From formal oxfords to statement heels, designer eyewear to luxury handbags — find your perfect style.</p>
+    </div>
+
+    <div class="category-grid stagger" role="list">
+      <div class="category-card" role="listitem" data-cat="mens-shoes" tabindex="0" aria-label="Men's Shoes category">
+        <div class="category-bg cat-mens-shoes">👞</div>
+        <div class="category-overlay">
+          <div class="category-name">Men's Shoes</div>
+          <div class="category-count">6 Styles Available</div>
+          <span class="category-cta">Shop Now <i class="fas fa-arrow-right"></i></span>
+        </div>
+      </div>
+      <div class="category-card" role="listitem" data-cat="womens-shoes" tabindex="0" aria-label="Women's Shoes category">
+        <div class="category-bg cat-womens-shoes">👠</div>
+        <div class="category-overlay">
+          <div class="category-name">Women's Shoes</div>
+          <div class="category-count">6 Styles Available</div>
+          <span class="category-cta">Shop Now <i class="fas fa-arrow-right"></i></span>
+        </div>
+      </div>
+      <div class="category-card" role="listitem" data-cat="eyeglasses" tabindex="0" aria-label="Eyeglasses category">
+        <div class="category-bg cat-eyeglasses">🕶️</div>
+        <div class="category-overlay">
+          <div class="category-name">Eyeglasses</div>
+          <div class="category-count">8 Frames Available</div>
+          <span class="category-cta">Shop Now <i class="fas fa-arrow-right"></i></span>
+        </div>
+      </div>
+      <div class="category-card" role="listitem" data-cat="purses" tabindex="0" aria-label="Purses and Handbags category">
+        <div class="category-bg cat-purses">👜</div>
+        <div class="category-overlay">
+          <div class="category-name">Purses & Handbags</div>
+          <div class="category-count">6 Designs Available</div>
+          <span class="category-cta">Shop Now <i class="fas fa-arrow-right"></i></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ BEST SELLERS ══ -->
+<section class="best-sellers" aria-labelledby="bs-heading">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-header-left reveal">
+        <div class="section-label">Top Picks</div>
+        <h2 id="bs-heading">Best Sellers</h2>
+      </div>
+      <a href="shop.html" class="view-all reveal">View All Products <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <div class="product-grid best-sellers-grid" role="list" aria-label="Best selling products">
+      <!-- Populated by JS -->
+    </div>
+  </div>
+</section>
+
+<!-- ══ PROMO BANNER ══ -->
+<section class="promo-banner" aria-label="Promotional offers">
+  <div class="promo-bg" aria-hidden="true"></div>
+  <div class="container">
+    <div class="promo-content reveal-left">
+      <div class="promo-eyebrow"><i class="fas fa-tag"></i> Limited Time Offers</div>
+      <h2 class="promo-title">New Arrivals &<br><span>Season Sales</span> Are Here!</h2>
+      <p class="promo-desc">
+        Step into style with our latest collection. Enjoy up to 25% off on select items — from statement heels to classic oxfords. Don't miss out!
+      </p>
+      <div class="promo-actions">
+        <a href="shop.html?sort=new" class="btn btn-gold"><i class="fas fa-sparkles"></i> New Arrivals</a>
+        <a href="shop.html" class="btn btn-outline-white"><i class="fas fa-percentage"></i> View All Sales</a>
+      </div>
+    </div>
+    <div class="promo-visual reveal-right">
+      <div class="promo-card">
+        <span class="promo-card-emoji">👠</span>
+        <div class="promo-card-name">Women's Heels</div>
+        <span class="promo-card-discount">Up to 20% OFF</span>
+      </div>
+      <div class="promo-card">
+        <span class="promo-card-emoji">🕶️</span>
+        <div class="promo-card-name">Eyeglasses</div>
+        <span class="promo-card-discount">Up to 25% OFF</span>
+      </div>
+      <div class="promo-card">
+        <span class="promo-card-emoji">👜</span>
+        <div class="promo-card-name">Handbags</div>
+        <span class="promo-card-discount">Up to 22% OFF</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FEATURES STRIP ══ -->
+<section style="padding:3rem 0;background:var(--accent)" aria-label="Store features">
+  <div class="container">
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;text-align:center" class="stagger">
+      <div class="reveal">
+        <div style="font-size:2.5rem;margin-bottom:0.75rem">🚚</div>
+        <h4 style="margin-bottom:0.25rem;font-family:var(--font-heading)">Free Delivery</h4>
+        <p style="font-size:0.85rem;color:var(--text-muted);margin:0">On orders above KSh 5,000</p>
+      </div>
+      <div class="reveal">
+        <div style="font-size:2.5rem;margin-bottom:0.75rem">🔄</div>
+        <h4 style="margin-bottom:0.25rem;font-family:var(--font-heading)">Easy Returns</h4>
+        <p style="font-size:0.85rem;color:var(--text-muted);margin:0">30-day hassle-free returns</p>
+      </div>
+      <div class="reveal">
+        <div style="font-size:2.5rem;margin-bottom:0.75rem">🔒</div>
+        <h4 style="margin-bottom:0.25rem;font-family:var(--font-heading)">Secure Payment</h4>
+        <p style="font-size:0.85rem;color:var(--text-muted);margin:0">M-Pesa, Card & Cash on delivery</p>
+      </div>
+      <div class="reveal">
+        <div style="font-size:2.5rem;margin-bottom:0.75rem">⭐</div>
+        <h4 style="margin-bottom:0.25rem;font-family:var(--font-heading)">Premium Quality</h4>
+        <p style="font-size:0.85rem;color:var(--text-muted);margin:0">Authentic, handpicked items</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ TESTIMONIALS ══ -->
+<section class="testimonials" aria-labelledby="reviews-heading">
+  <div class="container">
+    <div class="text-center reveal">
+      <div class="section-label">Customer Love</div>
+      <h2 id="reviews-heading" class="section-heading">What Our Customers Say</h2>
+      <p class="section-desc">Thousands of satisfied customers across Kenya trust Wa-ng'ash for their style needs.</p>
+    </div>
+
+    <div class="testimonial-carousel">
+      <div class="testimonial-track" role="list" aria-label="Customer testimonials">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+    <div class="carousel-controls">
+      <button class="carousel-btn carousel-prev" aria-label="Previous testimonial"><i class="fas fa-chevron-left"></i></button>
+      <div class="carousel-dots" role="tablist"></div>
+      <button class="carousel-btn carousel-next" aria-label="Next testimonial"><i class="fas fa-chevron-right"></i></button>
+    </div>
+  </div>
+</section>
+
+<!-- ══ NEWSLETTER ══ -->
+<section class="newsletter" aria-labelledby="newsletter-heading">
+  <div class="container">
+    <div class="newsletter-text reveal-left">
+      <h2 id="newsletter-heading">Get Style Updates</h2>
+      <p style="color:var(--text-muted);margin:0">New arrivals, exclusive deals & style tips — straight to your inbox.</p>
+    </div>
+    <form class="newsletter-form reveal-right" onsubmit="return false" aria-label="Newsletter subscription">
+      <input type="email" class="newsletter-input" placeholder="Enter your email address" aria-label="Email address" required>
+      <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Subscribe</button>
+    </form>
+  </div>
+</section>
+
+<!-- ══ FOOTER ══ -->
+<footer role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="index.html" class="nav-logo" style="margin-bottom:1rem">
+          <div class="nav-logo-icon">👟</div>
+          <div>
+            <div class="nav-logo-text">Wa-ng'ash</div>
+            <div class="nav-logo-sub">Stores</div>
+          </div>
+        </a>
+        <p class="footer-desc">
+          "Style That Speaks for You" — Premium fashion accessories for the modern Kenyan. Quality shoes, eyeglasses, and handbags at honest prices.
+        </p>
+        <div class="social-links" aria-label="Social media links">
+          <a href="#" class="social-link" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" class="social-link" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="#" class="social-link" aria-label="Twitter / X"><i class="fab fa-twitter"></i></a>
+          <a href="#" class="social-link" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+          <a href="#" class="social-link" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h4>Quick Links</h4>
+        <ul class="footer-links">
+          <li><a href="index.html"><i class="fas fa-chevron-right"></i> Home</a></li>
+          <li><a href="shop.html"><i class="fas fa-chevron-right"></i> All Products</a></li>
+          <li><a href="shop.html?category=mens-shoes"><i class="fas fa-chevron-right"></i> Men's Shoes</a></li>
+          <li><a href="shop.html?category=womens-shoes"><i class="fas fa-chevron-right"></i> Women's Shoes</a></li>
+          <li><a href="shop.html?category=eyeglasses"><i class="fas fa-chevron-right"></i> Eyeglasses</a></li>
+          <li><a href="shop.html?category=purses"><i class="fas fa-chevron-right"></i> Purses</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Customer Support</h4>
+        <ul class="footer-links">
+          <li><a href="about.html"><i class="fas fa-chevron-right"></i> About Us</a></li>
+          <li><a href="contact.html"><i class="fas fa-chevron-right"></i> Contact Us</a></li>
+          <li><a href="#"><i class="fas fa-chevron-right"></i> FAQs</a></li>
+          <li><a href="#"><i class="fas fa-chevron-right"></i> Shipping Policy</a></li>
+          <li><a href="#"><i class="fas fa-chevron-right"></i> Returns Policy</a></li>
+          <li><a href="#"><i class="fas fa-chevron-right"></i> Size Guide</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Contact Us</h4>
+        <div class="footer-contact-item">
+          <i class="fas fa-map-marker-alt"></i>
+          <span>Kenyatta Avenue, CBD<br>Nairobi, Kenya</span>
+        </div>
+        <div class="footer-contact-item">
+          <i class="fas fa-phone"></i>
+          <span>+254 700 123 456<br>+254 720 987 654</span>
+        </div>
+        <div class="footer-contact-item">
+          <i class="fas fa-envelope"></i>
+          <span>hello@wangash.co.ke</span>
+        </div>
+        <div class="footer-contact-item">
+          <i class="fas fa-clock"></i>
+          <span>Mon–Sat: 8am–8pm<br>Sun: 10am–6pm</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <div class="container" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem">
+      <p>© 2025 <span>Wa-ng'ash Stores</span>. All rights reserved. Made with ♥ in Kenya.</p>
+      <p>
+        <a href="#" style="color:rgba(255,255,255,0.45);margin:0 0.75rem">Privacy Policy</a>
+        <a href="#" style="color:rgba(255,255,255,0.45)">Terms of Service</a>
+      </p>
+    </div>
+  </div>
+</footer>
+
+<!-- Cart Sidebar -->
+<div class="cart-overlay" onclick="closeCart()" aria-hidden="true"></div>
+<aside class="cart-sidebar" aria-label="Shopping cart" role="complementary">
+  <div class="cart-header">
+    <div class="cart-title">
+      <i class="fas fa-shopping-bag" style="color:var(--secondary)"></i>
+      Your Cart
+      <span class="cart-count-badge">0</span>
+    </div>
+    <button class="cart-close" onclick="closeCart()" aria-label="Close cart"><i class="fas fa-times"></i></button>
+  </div>
+  <div class="cart-items" role="list"></div>
+  <div class="cart-footer">
+    <div class="cart-subtotal">
+      <span>Subtotal</span>
+      <span class="cart-subtotal-amount">KSh 0</span>
+    </div>
+    <div class="cart-subtotal">
+      <span>Shipping</span>
+      <span>KSh 250</span>
+    </div>
+    <div class="cart-total">
+      <span class="cart-total-label">Total</span>
+      <span class="cart-total-amount">KSh 0</span>
+    </div>
+    <button class="btn btn-checkout" onclick="openCheckout()">
+      <i class="fas fa-lock"></i> Proceed to Checkout
+    </button>
+    <button class="btn-continue" onclick="closeCart()">
+      ← Continue Shopping
+    </button>
+  </div>
+</aside>
+
+<!-- Quick View Modal -->
+<div class="modal-overlay" onclick="if(event.target===this)closeModal()" role="dialog" aria-modal="true" aria-label="Product quick view">
+  <div class="modal-content"></div>
+</div>
+
+<!-- Checkout Modal -->
+<div class="checkout-overlay modal-overlay" onclick="if(event.target===this)closeCheckout()" role="dialog" aria-modal="true" aria-label="Checkout">
+  <div class="checkout-content modal-content" style="padding:2rem;max-width:600px">
+    <button class="modal-close" onclick="closeCheckout()"><i class="fas fa-times"></i></button>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" aria-live="polite" aria-label="Notifications"></div>
+
+<!-- Back to Top -->
+<button class="back-to-top" aria-label="Back to top"><i class="fas fa-arrow-up"></i></button>
+
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

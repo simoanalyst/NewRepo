@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Shop all products at Wa-ng'ash Stores — shoes, eyeglasses, and handbags.">
+  <title>Shop — Wa-ng'ash Stores</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body data-page="shop">
+
+<!-- Page Loader -->
+<div class="page-loader" id="pageLoader">
+  <div class="loader-logo">Wa-ng'ash <span>Stores</span></div>
+  <div class="loader-bar"><div class="loader-progress"></div></div>
+</div>
+
+<!-- Navigation -->
+<nav class="navbar scrolled" role="navigation" aria-label="Main navigation">
+  <div class="container">
+    <a href="index.html" class="nav-logo">
+      <div class="nav-logo-icon">👟</div>
+      <div>
+        <div class="nav-logo-text">Wa-ng'ash</div>
+        <div class="nav-logo-sub">Stores</div>
+      </div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="shop.html" class="active">Shop</a></li>
+      <li><a href="shop.html?category=mens-shoes">Men's</a></li>
+      <li><a href="shop.html?category=womens-shoes">Women's</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <div class="nav-actions">
+      <button class="nav-icon-btn theme-toggle" aria-label="Toggle theme">
+        <i class="fas fa-moon theme-icon"></i>
+      </button>
+      <a href="wishlist.html" class="nav-icon-btn" aria-label="Wishlist">
+        <i class="far fa-heart"></i>
+        <span class="nav-badge wishlist-badge" style="display:none">0</span>
+      </a>
+      <button class="nav-icon-btn cart-toggle" aria-label="Cart">
+        <i class="fas fa-shopping-bag"></i>
+        <span class="nav-badge cart-badge" style="display:none">0</span>
+      </button>
+      <button class="hamburger" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile Menu -->
+<div class="mobile-menu">
+  <a href="index.html"><i class="fas fa-home"></i> Home</a>
+  <a href="shop.html"><i class="fas fa-store"></i> Shop All</a>
+  <a href="shop.html?category=mens-shoes"><i class="fas fa-shoe-prints"></i> Men's Shoes</a>
+  <a href="shop.html?category=womens-shoes"><i class="fas fa-shoe-prints"></i> Women's Shoes</a>
+  <a href="shop.html?category=eyeglasses"><i class="fas fa-glasses"></i> Eyeglasses</a>
+  <a href="shop.html?category=purses"><i class="fas fa-shopping-bag"></i> Purses</a>
+  <a href="about.html"><i class="fas fa-info-circle"></i> About Us</a>
+  <a href="contact.html"><i class="fas fa-envelope"></i> Contact</a>
+</div>
+
+<!-- Page Hero -->
+<section class="page-hero">
+  <div class="container">
+    <div class="section-label" style="justify-content:center;color:var(--secondary-light)">Our Collection</div>
+    <h1>Explore All Products</h1>
+    <p>Discover premium shoes, eyeglasses, and handbags — crafted for style and built to last.</p>
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="index.html">Home</a>
+      <span aria-hidden="true"><i class="fas fa-chevron-right" style="font-size:0.7rem"></i></span>
+      <span aria-current="page">Shop</span>
+    </nav>
+  </div>
+</section>
+
+<!-- Shop Layout -->
+<main class="container">
+  <div class="shop-layout">
+
+    <!-- Filters Sidebar -->
+    <aside class="filters-sidebar" aria-label="Product filters">
+      <div class="filter-section">
+        <div class="filter-title">Categories</div>
+        <div class="filter-options">
+          <label class="filter-option">
+            <input type="checkbox" data-filter="category" value="mens-shoes">
+            <label>Men's Shoes <span class="filter-count">6</span></label>
+          </label>
+          <label class="filter-option">
+            <input type="checkbox" data-filter="category" value="womens-shoes">
+            <label>Women's Shoes <span class="filter-count">6</span></label>
+          </label>
+          <label class="filter-option">
+            <input type="checkbox" data-filter="category" value="eyeglasses">
+            <label>Eyeglasses <span class="filter-count">8</span></label>
+          </label>
+          <label class="filter-option">
+            <input type="checkbox" data-filter="category" value="purses">
+            <label>Purses &amp; Handbags <span class="filter-count">6</span></label>
+          </label>
+        </div>
+      </div>
+
+      <div class="filter-section">
+        <div class="filter-title">Gender</div>
+        <div class="filter-options">
+          <label class="filter-option">
+            <input type="checkbox" data-filter="gender" value="men">
+            <label>Men</label>
+          </label>
+          <label class="filter-option">
+            <input type="checkbox" data-filter="gender" value="women">
+            <label>Women</label>
+          </label>
+        </div>
+      </div>
+
+      <div class="filter-section">
+        <div class="filter-title">Price Range (KSh)</div>
+        <div class="price-range-inputs">
+          <input type="number" id="priceMin" class="price-input" placeholder="Min" min="0" step="500" aria-label="Minimum price">
+          <span class="price-sep">—</span>
+          <input type="number" id="priceMax" class="price-input" placeholder="Max" min="0" step="500" aria-label="Maximum price">
+        </div>
+      </div>
+
+      <div class="filter-section">
+        <div class="filter-title">Tags</div>
+        <div class="filter-options">
+          <label class="filter-option">
+            <input type="checkbox" data-filter="tag" value="new">
+            <label>New Arrivals <span class="badge badge-new" style="font-size:0.6rem">New</span></label>
+          </label>
+          <label class="filter-option">
+            <input type="checkbox" data-filter="tag" value="bestseller">
+            <label>Best Sellers <span class="badge badge-popular" style="font-size:0.6rem">Hot</span></label>
+          </label>
+          <label class="filter-option">
+            <input type="checkbox" data-filter="tag" value="sale">
+            <label>On Sale <span class="badge badge-sale" style="font-size:0.6rem">Sale</span></label>
+          </label>
+        </div>
+      </div>
+
+      <button class="filter-clear" type="button">
+        <i class="fas fa-undo"></i> Clear All Filters
+      </button>
+    </aside>
+
+    <!-- Product Area -->
+    <div>
+      <div class="shop-toolbar">
+        <div class="search-box">
+          <i class="fas fa-search search-icon" aria-hidden="true"></i>
+          <input type="search" class="search-input" placeholder="Search products…" aria-label="Search products">
+        </div>
+        <select class="sort-select" aria-label="Sort products">
+          <option value="popular">Most Popular</option>
+          <option value="new">New Arrivals</option>
+          <option value="price-asc">Price: Low to High</option>
+          <option value="price-desc">Price: High to Low</option>
+          <option value="rating">Top Rated</option>
+        </select>
+        <span class="results-count" aria-live="polite">26 products found</span>
+      </div>
+
+      <div class="product-grid shop-grid" role="list" aria-label="Product catalog">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Newsletter -->
+<section class="newsletter" aria-labelledby="nl2-heading">
+  <div class="container">
+    <div class="newsletter-text">
+      <h2 id="nl2-heading">Never Miss a Deal</h2>
+      <p style="color:var(--text-muted);margin:0">Subscribe for exclusive discounts and new arrivals.</p>
+    </div>
+    <form class="newsletter-form" onsubmit="return false">
+      <input type="email" class="newsletter-input" placeholder="Your email address" aria-label="Email address" required>
+      <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Subscribe</button>
+    </form>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="index.html" class="nav-logo"><div class="nav-logo-icon">👟</div><div><div class="nav-logo-text">Wa-ng'ash</div><div class="nav-logo-sub">Stores</div></div></a>
+        <p class="footer-desc">"Style That Speaks for You" — Premium fashion accessories for the modern Kenyan.</p>
+        <div class="social-links">
+          <a href="#" class="social-link" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" class="social-link" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="#" class="social-link" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+          <a href="#" class="social-link" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Quick Links</h4>
+        <ul class="footer-links">
+          <li><a href="index.html"><i class="fas fa-chevron-right"></i> Home</a></li>
+          <li><a href="shop.html"><i class="fas fa-chevron-right"></i> All Products</a></li>
+          <li><a href="about.html"><i class="fas fa-chevron-right"></i> About Us</a></li>
+          <li><a href="contact.html"><i class="fas fa-chevron-right"></i> Contact</a></li>
+          <li><a href="wishlist.html"><i class="fas fa-chevron-right"></i> Wishlist</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Categories</h4>
+        <ul class="footer-links">
+          <li><a href="shop.html?category=mens-shoes"><i class="fas fa-chevron-right"></i> Men's Shoes</a></li>
+          <li><a href="shop.html?category=womens-shoes"><i class="fas fa-chevron-right"></i> Women's Shoes</a></li>
+          <li><a href="shop.html?category=eyeglasses"><i class="fas fa-chevron-right"></i> Eyeglasses</a></li>
+          <li><a href="shop.html?category=purses"><i class="fas fa-chevron-right"></i> Purses</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Contact</h4>
+        <div class="footer-contact-item"><i class="fas fa-phone"></i><span>+254 700 123 456</span></div>
+        <div class="footer-contact-item"><i class="fas fa-envelope"></i><span>hello@wangash.co.ke</span></div>
+        <div class="footer-contact-item"><i class="fas fa-map-marker-alt"></i><span>Kenyatta Ave, Nairobi</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="container" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem">
+      <p>© 2025 <span>Wa-ng'ash Stores</span>. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<!-- Cart Sidebar -->
+<div class="cart-overlay" onclick="closeCart()"></div>
+<aside class="cart-sidebar" aria-label="Shopping cart">
+  <div class="cart-header">
+    <div class="cart-title"><i class="fas fa-shopping-bag" style="color:var(--secondary)"></i> Your Cart <span class="cart-count-badge">0</span></div>
+    <button class="cart-close" onclick="closeCart()"><i class="fas fa-times"></i></button>
+  </div>
+  <div class="cart-items"></div>
+  <div class="cart-footer">
+    <div class="cart-subtotal"><span>Subtotal</span><span class="cart-subtotal-amount">KSh 0</span></div>
+    <div class="cart-subtotal"><span>Shipping</span><span>KSh 250</span></div>
+    <div class="cart-total">
+      <span class="cart-total-label">Total</span>
+      <span class="cart-total-amount">KSh 0</span>
+    </div>
+    <button class="btn btn-checkout" onclick="openCheckout()"><i class="fas fa-lock"></i> Proceed to Checkout</button>
+    <button class="btn-continue" onclick="closeCart()">← Continue Shopping</button>
+  </div>
+</aside>
+
+<!-- Quick View Modal -->
+<div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal-content"></div>
+</div>
+
+<!-- Checkout Modal -->
+<div class="checkout-overlay modal-overlay" onclick="if(event.target===this)closeCheckout()">
+  <div class="checkout-content modal-content" style="padding:2rem;max-width:600px">
+    <button class="modal-close" onclick="closeCheckout()"><i class="fas fa-times"></i></button>
+  </div>
+</div>
+
+<div class="toast-container" aria-live="polite"></div>
+<button class="back-to-top" aria-label="Back to top"><i class="fas fa-arrow-up"></i></button>
+
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
