@@ -168,8 +168,7 @@ function addToCart(productId, size = null, qty = 1) {
       name: product.name,
       price: product.price,
       category: product.category,
-      emoji: product.emoji,
-      bgColors: product.bgColors,
+      image: product.image,
       size: size,
       qty
     });
@@ -223,8 +222,8 @@ function renderCart() {
 
   container.innerHTML = cart.map(item => `
     <div class="cart-item" data-key="${item.key}">
-      <div class="cart-item-image" style="background:linear-gradient(135deg,${item.bgColors[0]},${item.bgColors[1]})">
-        ${item.emoji}
+      <div class="cart-item-image">
+        <img src="${item.image}" alt="${item.name}" loading="lazy">
       </div>
       <div class="cart-item-info">
         <div class="cart-item-name">${item.name}</div>
@@ -309,7 +308,6 @@ function isWishlisted(productId) {
    PRODUCT CARD RENDERER
 ══════════════════════════════════════ */
 function renderProductCard(product) {
-  const bg = `linear-gradient(145deg, ${product.bgColors[0]}, ${product.bgColors[1]})`;
   const discount = product.originalPrice
     ? Math.round((1 - product.price / product.originalPrice) * 100)
     : null;
@@ -325,7 +323,7 @@ function renderProductCard(product) {
   return `
     <div class="product-card" data-id="${product.id}">
       <div class="product-image-wrap">
-        <div class="product-image" style="background:${bg}">${product.emoji}</div>
+        <img class="product-image" src="${product.image}" alt="${product.name}" loading="lazy">
         ${badges ? `<div class="product-badges">${badges}</div>` : ''}
         <div class="product-actions-hover">
           <button class="action-btn ${wishlisted ? 'wishlisted' : ''}"
@@ -396,7 +394,6 @@ function openQuickView(productId) {
   const product = PRODUCTS.find(p => p.id === productId);
   if (!product) return;
 
-  const bg = `linear-gradient(145deg, ${product.bgColors[0]}, ${product.bgColors[1]})`;
   const discount = product.originalPrice
     ? Math.round((1 - product.price / product.originalPrice) * 100)
     : null;
@@ -412,7 +409,7 @@ function openQuickView(productId) {
   content.innerHTML = `
     <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
     <div class="modal-grid">
-      <div class="modal-image" style="background:${bg}">${product.emoji}</div>
+      <div class="modal-image"><img src="${product.image}" alt="${product.name}"></div>
       <div class="modal-info">
         <div class="modal-category">${formatCategory(product.category)}</div>
         <h2 class="modal-name">${product.name}</h2>
@@ -721,19 +718,18 @@ function renderProductDetail(product) {
   const mainImg = document.querySelector('.gallery-main');
   const thumbsEl = document.querySelector('.gallery-thumbs');
   if (mainImg) {
-    mainImg.style.background = bg;
-    mainImg.querySelector('.main-emoji').textContent = product.emoji;
+    mainImg.innerHTML = `<img src="${product.image}" alt="${product.name}">
+      <div class="gallery-zoom-hint"><i class="fas fa-search-plus"></i> Hover to zoom</div>`;
   }
+  /* Generate crop variants for thumbs */
+  const cropVariants = ['center', 'top', 'bottom', 'left'];
   if (thumbsEl) {
-    const thumbBgs = [
-      `linear-gradient(145deg, ${product.bgColors[0]}, ${product.bgColors[1]})`,
-      `linear-gradient(145deg, ${product.bgColors[1]}, ${product.bgColors[0]}aa)`,
-      `linear-gradient(45deg, ${product.bgColors[0]}88, ${product.bgColors[1]})`,
-      `linear-gradient(225deg, ${product.bgColors[0]}, ${product.bgColors[1]}88)`
-    ];
-    thumbsEl.innerHTML = thumbBgs.map((bg, i) =>
-      `<div class="gallery-thumb ${i === 0 ? 'active' : ''}" style="background:${bg}" onclick="selectThumb(this,'${bg}')">${product.emoji}</div>`
-    ).join('');
+    thumbsEl.innerHTML = cropVariants.map((crop, i) => {
+      const url = product.image.replace('fit=crop', `fit=crop&crop=${crop}`);
+      return `<div class="gallery-thumb ${i === 0 ? 'active' : ''}" onclick="selectThumb(this,'${url}')">
+        <img src="${url}" alt="${product.name} view ${i+1}" loading="lazy">
+      </div>`;
+    }).join('');
   }
 
   /* Info */
@@ -813,11 +809,11 @@ function renderRelatedProducts(product) {
   grid.innerHTML = related.map(renderProductCard).join('');
 }
 
-function selectThumb(el, bg) {
+function selectThumb(el, url) {
   document.querySelectorAll('.gallery-thumb').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
-  const main = document.querySelector('.gallery-main');
-  if (main) main.style.background = bg;
+  const main = document.querySelector('.gallery-main img');
+  if (main) main.src = url;
 }
 
 /* ══════════════════════════════════════
