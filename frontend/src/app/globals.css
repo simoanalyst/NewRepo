@@ -1,0 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-display: "Cormorant Garamond", serif;
+  --font-body: "Inter", sans-serif;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-white text-ink-900 antialiased dark:bg-ink-900 dark:text-beige-100;
+  }
+  ::selection {
+    @apply bg-gold-300/60 text-ink-900;
+  }
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-gold-300/60 dark:bg-gold-700/60;
+  }
+}
+
+@layer components {
+  .container-luxe {
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+
+  .glass-panel {
+    @apply border border-white/30 bg-white/60 backdrop-blur-xl dark:border-white/10 dark:bg-ink-800/60;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-ink-900 px-6 py-3 text-sm font-medium tracking-wide text-white transition-all duration-300 hover:bg-gold-600 hover:shadow-gold active:scale-95 dark:bg-gold-500 dark:text-ink-900 dark:hover:bg-gold-400;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-ink-900/15 bg-transparent px-6 py-3 text-sm font-medium tracking-wide text-ink-900 transition-all duration-300 hover:border-gold-500 hover:text-gold-600 active:scale-95 dark:border-white/20 dark:text-beige-100 dark:hover:border-gold-400 dark:hover:text-gold-300;
+  }
+
+  .btn-gold {
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-gold-gradient px-6 py-3 text-sm font-semibold tracking-wide text-white shadow-gold transition-transform duration-300 hover:scale-[1.02] active:scale-95;
+  }
+
+  .card-luxe {
+    @apply rounded-xl2 border border-ink-900/5 bg-white shadow-luxe transition-shadow duration-300 hover:shadow-xl dark:border-white/10 dark:bg-ink-800;
+  }
+
+  .section-heading {
+    @apply font-display text-3xl font-medium tracking-tight text-ink-900 sm:text-4xl dark:text-white;
+  }
+
+  .section-subheading {
+    @apply mt-3 max-w-2xl text-sm text-ink-700/70 sm:text-base dark:text-beige-100/70;
+  }
+
+  .input-luxe {
+    @apply w-full rounded-lg border border-ink-900/15 bg-transparent px-4 py-2.5 text-sm outline-none transition-colors placeholder:text-ink-500/50 focus:border-gold-500 dark:border-white/15 dark:placeholder:text-beige-100/40;
+  }
+
+  .skeleton {
+    @apply relative overflow-hidden bg-beige-100 dark:bg-ink-700;
+  }
+  .skeleton::after {
+    content: "";
+    @apply absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/40 to-transparent;
+  }
+}
